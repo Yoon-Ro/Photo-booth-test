@@ -1,4 +1,4 @@
-// File: /Users/yoonro/Desktop/Photo booth test/src/app/page.tsx
+// File: /Users/yoonro/Library/CloudStorage/GoogleDrive-yoonro1995@gmail.com/My Drive/GitHub/Photo booth test/src/app/page.tsx
 import * as entry from '../../../src/app/page.js'
 import type { ResolvingMetadata } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

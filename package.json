@@ -10,9 +10,10 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@vercel/analytics": "^1.5.0",
     "html2canvas": "^1.4.1",
     "lineicons-react": "^2.0.0",
-    "next": "13.5.6",
+    "next": "^13.5.8",
     "react": "18.2.0",
     "react-confetti": "^6.4.0",
     "react-dom": "18.2.0",
