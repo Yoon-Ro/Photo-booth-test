@@ -1,0 +1,31 @@
+{
+  "name": "photo-booth",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@heroicons/react": "^2.2.0",
+    "html2canvas": "^1.4.1",
+    "lineicons-react": "^2.0.0",
+    "next": "13.5.6",
+    "react": "18.2.0",
+    "react-confetti": "^6.4.0",
+    "react-dom": "18.2.0",
+    "react-icons": "^5.5.0",
+    "react-webcam": "^7.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "autoprefixer": "^10.0.0",
+    "postcss": "^8.0.0",
+    "tailwindcss": "^3.0.0",
+    "typescript": "^5.0.0"
+  }
+}
