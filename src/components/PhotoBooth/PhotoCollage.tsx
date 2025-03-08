@@ -60,24 +60,125 @@ const PhotoCollage = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  const handleDownload = async () => {
-    if (!collageRef.current) return;
+  const createAndDownloadCollage = async (photos: string[], index?: number) => {
     try {
-      const canvas = await html2canvas(collageRef.current, {
+      // Calculate dimensions
+      const downloadWidth = 360;
+      const photoWidth = downloadWidth; // Use full width for the photo
+      const containerPadding = Math.round(photoWidth * 0.03); // 3% of photo width for container padding
+
+      console.log('Download dimensions:', {
+        containerWidth: downloadWidth,
+        photoWidth,
+        containerPadding,
+      });
+
+      // Create a wrapper div with minimal padding
+      const wrapper = document.createElement('div');
+      wrapper.style.position = 'fixed';
+      wrapper.style.left = '-9999px';
+      wrapper.style.top = '0';
+      wrapper.style.backgroundColor = '#ffffff';
+      wrapper.style.padding = `${containerPadding}px`;
+      wrapper.style.width = `${photoWidth}px`;
+      wrapper.style.borderRadius = '8px';
+      wrapper.style.boxSizing = 'border-box'; // Include padding in width
+      document.body.appendChild(wrapper);
+
+      // Create the photo container
+      const photoContainer = document.createElement('div');
+      photoContainer.style.width = '100%';
+      photoContainer.style.display = 'flex';
+      photoContainer.style.flexDirection = 'column';
+      photoContainer.style.gap = `${containerPadding}px`;
+      photoContainer.style.backgroundColor = '#ffffff';
+      photoContainer.style.boxSizing = 'border-box';
+      wrapper.appendChild(photoContainer);
+
+      // Add each photo
+      for (const photo of photos) {
+        const photoDiv = document.createElement('div');
+        photoDiv.style.flex = '1';
+        photoDiv.style.position = 'relative';
+        photoDiv.style.width = '100%';
+        photoDiv.style.borderRadius = '8px';
+        photoDiv.style.overflow = 'hidden';
+        photoDiv.style.backgroundColor = '#ffffff';
+        photoDiv.style.boxSizing = 'border-box';
+
+        const img = document.createElement('img');
+        img.src = photo;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'cover';
+
+        photoDiv.appendChild(img);
+        photoContainer.appendChild(photoDiv);
+      }
+
+      // Wait for images to load
+      await Promise.all(
+        Array.from(wrapper.getElementsByTagName('img')).map(
+          (img) =>
+            new Promise((resolve) => {
+              if (img.complete) resolve(true);
+              img.onload = () => resolve(true);
+              img.onerror = () => resolve(false);
+            })
+        )
+      );
+
+      // Calculate the total height needed
+      const totalHeight = photoContainer.offsetHeight + (containerPadding * 2);
+      wrapper.style.height = `${totalHeight}px`;
+
+      // Use html2canvas with better settings
+      const canvas = await html2canvas(wrapper, {
         backgroundColor: '#ffffff',
         scale: 2,
         logging: false,
-        useCORS: true
+        useCORS: true,
+        allowTaint: true,
+        width: photoWidth,
+        height: totalHeight
       });
 
+      // Clean up
+      document.body.removeChild(wrapper);
+
+      // Download the image
       const link = document.createElement('a');
       link.href = canvas.toDataURL('image/jpeg', 1.0);
-      link.download = 'photo-booth-collage.jpg';
+      link.download = index !== undefined 
+        ? `photo-booth-collage-${index + 1}.jpg` 
+        : 'photo-booth-collage.jpg';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
     } catch (error) {
       console.error('Error creating collage:', error);
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!collageRef.current || !photos.length) return;
+    try {
+      // Store original transform
+      const originalTransform = collageRef.current.style.transform;
+      // Temporarily remove 3D transform for clean capture
+      collageRef.current.style.transform = 'none';
+
+      await createAndDownloadCollage(photos);
+
+      // Restore transform
+      collageRef.current.style.transform = originalTransform;
+    } catch (error) {
+      console.error('Error in handleDownload:', error);
+      // Restore transform in case of error
+      if (collageRef.current) {
+        collageRef.current.style.transform = originalTransform;
+      }
     }
   };
 
@@ -113,7 +214,7 @@ const PhotoCollage = () => {
         gravity={0.2}
         initialVelocityY={10}
       />
-      <div className="relative mb-20">
+      <div className="relative mb-8">
         {previousPhotoSets.map((photoSet, setIndex) => {
           const scale = 1 - (setIndex + 1) * 0.1;
           const width = baseWidth * scale;
@@ -154,25 +255,7 @@ const PhotoCollage = () => {
                   tooltip.style.top = `${y}px`;
                 }
               }}
-              onClick={async () => {
-                try {
-                  const canvas = await html2canvas(collageRef.current!, {
-                    backgroundColor: '#ffffff',
-                    scale: 2,
-                    logging: false,
-                    useCORS: true
-                  });
-
-                  const link = document.createElement('a');
-                  link.href = canvas.toDataURL('image/jpeg', 1.0);
-                  link.download = `photo-booth-collage-${setIndex + 1}.jpg`;
-                  document.body.appendChild(link);
-                  link.click();
-                  document.body.removeChild(link);
-                } catch (error) {
-                  console.error('Error downloading previous collage:', error);
-                }
-              }}
+              onClick={() => createAndDownloadCollage(photoSet, setIndex)}
             >
               <div className="absolute inset-0 flex items-center justify-center group-hover:bg-blue-500/30 transition-all duration-300 rounded-lg">
                 <span className="tooltip fixed opacity-0 group-hover:opacity-100 text-white font-medium transition-opacity duration-300 pointer-events-none bg-black/50 px-2 py-1 rounded whitespace-nowrap transform -translate-x-1/2 -translate-y-full z-50">
