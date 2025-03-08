@@ -11,6 +11,7 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@vercel/analytics": "^1.5.0",
+    "html-to-image": "^1.11.13",
     "html2canvas": "^1.4.1",
     "lineicons-react": "^2.0.0",
     "next": "^13.5.8",
