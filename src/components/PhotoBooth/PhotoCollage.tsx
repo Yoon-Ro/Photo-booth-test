@@ -163,9 +163,11 @@ const PhotoCollage = () => {
 
   const handleDownload = async () => {
     if (!collageRef.current || !photos.length) return;
+    
+    // Store original transform
+    const originalTransform = collageRef.current.style.transform;
+    
     try {
-      // Store original transform
-      const originalTransform = collageRef.current.style.transform;
       // Temporarily remove 3D transform for clean capture
       collageRef.current.style.transform = 'none';
 
