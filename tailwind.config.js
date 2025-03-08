@@ -6,7 +6,31 @@ module.exports = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      keyframes: {
+        slideUpDown: {
+          '0%': { 
+            transform: 'translateY(20%)',
+            opacity: '0'
+          },
+          '10%': {
+            transform: 'translateY(0)',
+            opacity: '1'
+          },
+          '90%': {
+            transform: 'translateY(0)',
+            opacity: '1'
+          },
+          '100%': {
+            transform: 'translateY(-20%)',
+            opacity: '0'
+          }
+        }
+      },
+      animation: {
+        'slideUpDown': 'slideUpDown 4s ease-in-out infinite'
+      }
+    },
   },
   plugins: [],
 } 
